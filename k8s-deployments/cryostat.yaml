@@ -1,0 +1,64 @@
+kind: Cryostat
+apiVersion: operator.cryostat.io/v1beta1
+metadata:
+ name: cryostat-sample
+spec:
+ minimal: false
+ networkOptions:
+   coreConfig:
+     annotations:
+       nginx.ingress.kubernetes.io/backend-protocol : HTTPS
+       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+     ingressSpec:
+       tls:
+       - {}
+       rules:
+       - host: testing.cryostat
+         http:
+           paths:
+           - path: /
+             pathType: Prefix
+             backend:
+               service:
+                 name: cryostat-sample
+                 port:
+                   number: 8181
+   commandConfig:
+     annotations:
+       nginx.ingress.kubernetes.io/backend-protocol : HTTPS
+       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+     ingressSpec:
+       tls:
+       - {}
+       rules:
+       - host: testing.cryostat-command
+         http:
+           paths:
+           - path: /
+             pathType: Prefix
+             backend:
+               service:
+                 name: cryostat-sample-command
+                 port:
+                   number: 9090
+   grafanaConfig:
+     annotations:
+       nginx.ingress.kubernetes.io/backend-protocol : HTTPS
+       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+     ingressSpec:
+       tls:
+       - {}
+       rules:
+       - host: testing.cryostat-grafana
+         http:
+           paths:
+           - path: /
+             pathType: Prefix
+             backend:
+               service:
+                 name: cryostat-sample-grafana
+                 port:
+                   number: 3000

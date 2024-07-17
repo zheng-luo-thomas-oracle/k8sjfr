@@ -1,12 +1,13 @@
 package oracle.jms.jfr.collector;
 
+import oracle.jms.jfr.collector.request.JFRRecordingRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class StartRecordingRequestTest {
+class JFRRecordingRequestTest {
     @Test
-    void testFromJsonString() {
+    void testFromJsonPayload() {
         String jsonString = """
                 {
                     "ip": "10.1.1.1",
@@ -14,7 +15,7 @@ class StartRecordingRequestTest {
                     "numberOfSeconds": "5"
                 }
                 """;
-        StartRecordingRequest request = StartRecordingRequest.fromJsonString(jsonString);
+        JFRRecordingRequest request = JFRRecordingRequest.fromJsonPayload(jsonString);
         assertNotNull(request);
     }
 

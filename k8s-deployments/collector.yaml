@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jfr-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jfr-collector
+  template:
+    metadata:
+      labels:
+        app: jfr-collector
+    spec:
+      serviceAccountName: collector-sa
+      automountServiceAccountToken: true
+      containers:
+      - name: simple-counter-container
+        image: iad.ocir.io/oardccsi/jfr-k8s-collector
+        imagePullPolicy: Always
+

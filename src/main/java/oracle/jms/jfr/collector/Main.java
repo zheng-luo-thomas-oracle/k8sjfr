@@ -1,43 +1,73 @@
 package oracle.jms.jfr.collector;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.Javalin;
 
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
 
 public class Main {
-    private static final Logger LOGGER=Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-    public static void main(String[] args) throws IOException, MalformedObjectNameException, InterruptedException {
-        HTTPService httpService = new HTTPService();
+    public static void main(
+            String[] args) throws IOException, MalformedObjectNameException, InterruptedException {
 
-        get("/hello", (req, res) -> "Hello World");
+        CollectorService collectorService = new CollectorService();
 
-        get("/getPodsInfo", (req, res) -> {
-            LOGGER.info("getPodsInfo");
-            return httpService.getPodsInfo();
+        var app = Javalin.create(/*config*/);
+
+        app.get("/", ctx -> ctx.result(getHelpMsg()));
+
+        app.get("/podInfo", ctx -> {
+            LOGGER.info("RECEIVED podInfo");
+            ctx.result(collectorService.getPodInfo());
         });
 
-        get("/getPodsIP", (req, res) -> {
-            LOGGER.info("getPodsIP");
-            return httpService.getPodsIP();
+        app.get("/podIP", ctx -> {
+            LOGGER.info("RECEIVED podIP");
+            ctx.result(collectorService.getPodIP());
         });
 
-        post("/startRecording", (req, res) -> {
-            LOGGER.info("startRecording");
-            return httpService.startRecordings(req.body());
+        app.get("/samplePayload", ctx -> {
+            LOGGER.info("RECEIVED samplePayload");
+            ctx.result(collectorService.getSamplePayload());
         });
 
+        app.get("/recording", ctx -> {
+            //            LOGGER.info("RECEIVED GET recording");
+            ctx.result(collectorService.listRecording());
+        });
 
+        app.post("/recording", ctx -> {
+            LOGGER.info("RECEIVED POST recording");
+            ctx.result(collectorService.startRecordings(ctx.body()));
+        });
+
+        app.start(4567);
     }
 
+    private static String getHelpMsg() {
+        return """
+                 GET /
+                 return help msg
+                 ---
+                 GET /podInfo
+                 return detailed information of JMS enabled pods
+                 ---
+                 GET /podIP
+                 return ip of JMS enabled pods
+                 ---
+                 GET /samplePayload
+                 return sample json payload body
+                 ---
+                 GET /recording
+                 return all submitted recording requests
+                 ---
+                 POST /recording
+                 start JFR recording(s). Requires payload body
+                """;
+    }
 
 
 }
